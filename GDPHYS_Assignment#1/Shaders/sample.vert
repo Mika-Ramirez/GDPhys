@@ -16,5 +16,5 @@ void main()
 	//this denotes the final position of the vertex / point
 
 	//Multiply the transformation matrix to the vec4  to the vec4 version of aPos
-	gl_Position = projection * transform * vec4(aPos, 1.0);
+	gl_Position = transform * vec4(aPos, 1.0);
 }

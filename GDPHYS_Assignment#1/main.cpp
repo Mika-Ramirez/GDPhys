@@ -1,8 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "P6/MyVector.h"  
 
 #include <iostream>
 #include <string>
@@ -11,15 +9,15 @@
 #include "tiny_obj_loader.h"
 
 
-//Modifier for the model's x Position
+//Position
 float theta = 0.0f;
 
-// Set rotation axis to x-axis initially
+//Rotation
 float axis_x = 0.0f;
 float axis_y = 1.0f;
 float axis_z = 0.0f;
 
-// Adjust initial position and scale of the model
+// Position and Scale
 float x_mod = 0.0f;
 float y_mod = 0.0f;
 float z_mod = -3.0f;
@@ -118,7 +116,7 @@ int main(void)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * attributes.vertices.size(),
-        attributes.vertices.data() /*Array*/, GL_STATIC_DRAW);
+        attributes.vertices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
@@ -133,14 +131,32 @@ int main(void)
 
     glm::mat4 identity_martix = glm::mat4(1.0f);
 
-    glm::mat4 projectionMatrix = glm::ortho(
-        -2.f, //L
-        2.f,//R
-        -2.f,//B
-        2.f,//T
-        -1.f,//Znear
-        100.f);//Zfar
+    glm::mat4 projectionMatrix = glm::ortho( -2.f, 2.f, -2.f, 2.f, -1.f, 100.f);
     
+    P6::MyVector position(0, 3, 0);
+    P6::MyVector scale(3, 3, 0);
+
+    std::cout << "Magnitude" << std::endl;
+    std::cout << position.Magnitude() << std::endl;
+    std::cout << scale.Magnitude() << "\n" << std::endl;
+
+    std::cout << "Direction" << std::endl;
+    std::cout << position.Direction().x << std::endl;
+    std::cout << position.Direction().y << std::endl;
+    std::cout << position.Direction().z << "\n" << std::endl;
+
+    std::cout << "Scalar Multiplication" << std::endl;
+    std::cout << position.ScalarMultiplication(3.f).x << std::endl;
+    std::cout << position.ScalarMultiplication(3.f).y << std::endl;
+    std::cout << position.ScalarMultiplication(3.f).z << "\n" << std::endl;
+
+    std::cout << "Dot Product" << std::endl;
+    std::cout << position.DotProduct(scale) << "\n" << std::endl;
+
+    std::cout << "Cross Product" << std::endl;
+    std::cout << position.CrossProduct(scale).x << std::endl;
+    std::cout << position.CrossProduct(scale).y << std::endl;
+    std::cout << position.CrossProduct(scale).z << "\n" << std::endl;
 
 
     while (!glfwWindowShouldClose(window))
@@ -149,11 +165,10 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
 
 
-        glm::mat4 transformation_matrix = glm::translate(identity_martix, glm::vec3(x_mod, y_mod, z_mod));
-        transformation_matrix = glm::scale(transformation_matrix, glm::vec3(scale, scale, scale));
+        glm::mat4 transformation_matrix = glm::translate(identity_martix, (glm::vec3)position);
+        transformation_matrix = glm::scale(transformation_matrix, (glm::vec3) scale);
         transformation_matrix = glm::rotate(transformation_matrix, glm::radians(theta), glm::normalize(glm::vec3(axis_x, axis_y, axis_z)));
-        unsigned int projectionLoc = glGetUniformLocation(shaderProg, "projection");
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+        
         unsigned int transformLoc = glGetUniformLocation(shaderProg, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transformation_matrix)); \
         glUseProgram(shaderProg);

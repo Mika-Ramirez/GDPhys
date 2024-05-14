@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="P6\MyVector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Shaders\sample.frag">
@@ -167,6 +168,7 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="P6\MyVector.h" />
     <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
