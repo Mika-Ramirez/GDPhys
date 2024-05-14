@@ -24,7 +24,7 @@ float x_mod = 0.0f;
 float y_mod = 0.0f;
 float z_mod = -3.0f;
 
-float scale = 1.f;
+float scale = 0.5f;
 
 int main(void)
 {
@@ -42,8 +42,8 @@ int main(void)
     const char* f = fragS.c_str();
 
     GLFWwindow* window;
-    float window_width = 600;
-    float window_height = 600;
+    float window_width = 800;
+    float window_height = 800;
 
     if (!glfwInit())
         return -1;
@@ -74,8 +74,8 @@ int main(void)
 
     glViewport(0, // Min x
         0,//Min y
-        600,//Width
-        600); // Height
+        800,//Width
+        800); // Height
     
 
     std::string path = "3D/sphere.obj";
