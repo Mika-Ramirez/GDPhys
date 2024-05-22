@@ -9,11 +9,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
-
 using namespace std::chrono_literals;
 constexpr std::chrono::nanoseconds timestep(16ms);
-
-
 
 //Position
 float theta = 0.0f;
@@ -32,8 +29,6 @@ float scale = 0.5f;
 
 int main(void)
 {
-   
-
     std::fstream vertSrc("Shaders/sample.vert");
     std::stringstream vertBuff;
     vertBuff << vertSrc.rdbuf();
@@ -53,7 +48,7 @@ int main(void)
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(window_width, window_height, "Ramirez, Catrina Mikaela G.", NULL, NULL);
+    window = glfwCreateWindow(window_width, window_height, "Ramirez, Catrina Mikaela G. & Jacinto, Gracielle Ann R.", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -112,7 +107,6 @@ int main(void)
         0,1,2
     };
 
-
     GLuint VAO, VBO, EBO;
 
     glGenVertexArrays(1, &VAO);
@@ -164,7 +158,6 @@ int main(void)
 
     bool end = false;
 
-
     while (!glfwWindowShouldClose(window))
     {
 
@@ -179,24 +172,13 @@ int main(void)
 
         if (curr_ns >= timestep) {
             auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
-            /*std::cout << "MS: " << (float)ms.count() << '\n';*/
-
             curr_ns -= curr_ns;
-
-            //std::cout << "P6 Update\n";
             particle.Update((float)ms.count() / 1000);
         }
-        //std::cout << "Normal Update\n";
-
-        //std::cout << curr_ns.count() << std::endl;
-
-       
         
-
         glm::mat4 transformation_matrix = glm::translate(identity_matrix, (glm::vec3)particle.Position);
         transformation_matrix = glm::scale(transformation_matrix, (glm::vec3) scale);
         transformation_matrix = glm::rotate(transformation_matrix, glm::radians(theta), glm::normalize(glm::vec3(axis_x, axis_y, axis_z)));
-        
 
         unsigned int transformLoc = glGetUniformLocation(shaderProg, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transformation_matrix)); 
@@ -209,15 +191,13 @@ int main(void)
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, mesh_indices.size(), GL_UNSIGNED_INT, 0);
 
-        if (particle.Position.y <= -351.f) {
+        if (particle.Position.y <= -351.f && !end) {
             auto end_time = clock::now();
             auto land = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-            
-            end = true;
             std::cout << "It took " << land.count() / 1000.f << " seconds for it to land";
+            end = true;
         }
-        
-
+       
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
