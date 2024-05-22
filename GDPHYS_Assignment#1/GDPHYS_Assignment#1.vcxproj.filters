@@ -24,6 +24,9 @@
     <ClCompile Include="P6\MyVector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="P6\PhysicsParticles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Shaders\sample.frag" />
@@ -34,6 +37,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="P6\MyVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="P6\PhysicsParticles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

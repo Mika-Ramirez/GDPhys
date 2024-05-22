@@ -1,12 +1,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "P6/MyVector.h"  
+#include "P6/PhysicsParticles.h"
 
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
+
+
+using namespace std::chrono_literals;
+constexpr std::chrono::nanoseconds timestep(16ms);
+
 
 
 //Position
@@ -26,6 +32,7 @@ float scale = 0.5f;
 
 int main(void)
 {
+   
 
     std::fstream vertSrc("Shaders/sample.vert");
     std::stringstream vertBuff;
@@ -129,34 +136,33 @@ int main(void)
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glm::mat4 identity_martix = glm::mat4(1.0f);
+    P6::PhysicsParticles particle = P6::PhysicsParticles();
 
-    glm::mat4 projectionMatrix = glm::ortho( -2.f, 2.f, -2.f, 2.f, -1.f, 100.f);
-    
-    P6::MyVector position(0, 3, 0);
-    P6::MyVector scale(3, 3, 0);
+    glm::mat4 identity_matrix = glm::mat4(1.0f);
 
-    std::cout << "Magnitude" << std::endl;
-    std::cout << position.Magnitude() << std::endl;
-    std::cout << scale.Magnitude() << "\n" << std::endl;
+    glm::mat4 projectionMatrix = glm::ortho( -400.f, 400.f, -400.f, 400.f, -1.f, 100.f);   
+   
+    P6::MyVector scale(50, 50, 50);
 
-    std::cout << "Direction" << std::endl;
-    std::cout << position.Direction().x << std::endl;
-    std::cout << position.Direction().y << std::endl;
-    std::cout << position.Direction().z << "\n" << std::endl;
+    int px, py, pz;
+    std::cout << "X Velocity: ";
+    std::cin >> px;
+    std::cout << "Y Velocity: ";
+    std::cin >> py;
+    std::cout << "Z Velocity: ";
+    std::cin >> pz;
 
-    std::cout << "Scalar Multiplication" << std::endl;
-    std::cout << position.ScalarMultiplication(3.f).x << std::endl;
-    std::cout << position.ScalarMultiplication(3.f).y << std::endl;
-    std::cout << position.ScalarMultiplication(3.f).z << "\n" << std::endl;
+    using clock = std::chrono::high_resolution_clock;
+    auto start_time = clock::now();
+    auto curr_time = clock::now();
+    auto prev_time = curr_time;
+    std::chrono::nanoseconds curr_ns(0);
 
-    std::cout << "Dot Product" << std::endl;
-    std::cout << position.DotProduct(scale) << "\n" << std::endl;
+    particle.Position = P6::MyVector(0, -350, 0);
+    particle.Velocity = P6::MyVector(px, py, pz);
+    particle.Acceleration = P6::MyVector(0, -50, 0);
 
-    std::cout << "Cross Product" << std::endl;
-    std::cout << position.CrossProduct(scale).x << std::endl;
-    std::cout << position.CrossProduct(scale).y << std::endl;
-    std::cout << position.CrossProduct(scale).z << "\n" << std::endl;
+    bool end = false;
 
 
     while (!glfwWindowShouldClose(window))
@@ -164,18 +170,53 @@ int main(void)
 
         glClear(GL_COLOR_BUFFER_BIT);
 
+        curr_time = clock::now();
 
-        glm::mat4 transformation_matrix = glm::translate(identity_martix, (glm::vec3)position);
+        auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(curr_time - prev_time);
+        prev_time = curr_time;
+
+        curr_ns += dur;
+
+        if (curr_ns >= timestep) {
+            auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(curr_ns);
+            /*std::cout << "MS: " << (float)ms.count() << '\n';*/
+
+            curr_ns -= curr_ns;
+
+            //std::cout << "P6 Update\n";
+            particle.Update((float)ms.count() / 1000);
+        }
+        //std::cout << "Normal Update\n";
+
+        //std::cout << curr_ns.count() << std::endl;
+
+       
+        
+
+        glm::mat4 transformation_matrix = glm::translate(identity_matrix, (glm::vec3)particle.Position);
         transformation_matrix = glm::scale(transformation_matrix, (glm::vec3) scale);
         transformation_matrix = glm::rotate(transformation_matrix, glm::radians(theta), glm::normalize(glm::vec3(axis_x, axis_y, axis_z)));
         
+
         unsigned int transformLoc = glGetUniformLocation(shaderProg, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transformation_matrix)); \
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transformation_matrix)); 
+        unsigned int projectionLoc = glGetUniformLocation(shaderProg, "projection");
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
         glUseProgram(shaderProg);
         glBindVertexArray(VAO);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, mesh_indices.size(), GL_UNSIGNED_INT, 0);
+
+        if (particle.Position.y <= -351.f) {
+            auto end_time = clock::now();
+            auto land = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+            
+            end = true;
+            std::cout << "It took " << land.count() / 1000.f << " seconds for it to land";
+        }
+        
 
         glfwSwapBuffers(window);
         glfwPollEvents();
