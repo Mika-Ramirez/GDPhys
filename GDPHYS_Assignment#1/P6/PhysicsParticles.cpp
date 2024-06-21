@@ -2,26 +2,25 @@
 
 using namespace P6;
 
-P6::PhysicsParticles::PhysicsParticles()
+void PhysicsParticles::UpdatePosition(float time)
 {
-	this->Acceleration = MyVector(0, 0, 0);
-	this->Velocity = MyVector(0, 0, 0);
-	this->Position = MyVector(0, 0, 0);
 
+	float newTime = time * time;
+	this->Position = this->Position + (this->Velocity.ScalarMultiplication(time)) + ((this->Acceleration.ScalarMultiplication(newTime)).ScalarMultiplication(0.5f));
 }
 
-void P6::PhysicsParticles::UpdatePosition(float time)
+void PhysicsParticles::UpdateVelocity(float time)
 {
-	this->Position = (this->Velocity * time) + ((this->Acceleration * time * time) * (1.f / 2.f)) + this->Position;
+	this->Velocity = this->Velocity + (this->Acceleration.ScalarMultiplication(time));
 }
 
-void P6::PhysicsParticles::UpdateVelocity(float time)
-{
-	this->Velocity = (this->Acceleration * time) + this->Velocity;
-}
-
-void P6::PhysicsParticles::Update(float time)
+void P6::PhysicsParticles::update(float time)
 {
 	this->UpdatePosition(time);
 	this->UpdateVelocity(time);
+}
+
+void P6::PhysicsParticles::Destroy()
+{
+	this->isDestroyed = true;		
 }

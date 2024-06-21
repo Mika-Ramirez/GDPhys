@@ -3,23 +3,29 @@
 
 namespace P6 {
 
-	class PhysicsParticles 
+	class PhysicsParticles : public MyVector
 	{
 	public:
 		float mass = 0;
-
-		MyVector Position;
 		MyVector Velocity;
+		MyVector Position;
 		MyVector Acceleration;
 
-		PhysicsParticles();
 
 	protected:
 		void UpdatePosition(float time);
 		void UpdateVelocity(float time);
 
+		bool isDestroyed = false;
+
 	public:
-		void Update(float time);
+		void update(float time);
+
+		void Destroy();
+
+		bool IsDestroyed() {
+			return isDestroyed;
+		}
 
 	};
 }
